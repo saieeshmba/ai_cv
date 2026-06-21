@@ -209,7 +209,7 @@ export default function Home(): JSX.Element {
                   <strong>Flagged segments (sample):</strong>
                   <ul>
                     {analysis.estimate.flagged_segments.map((segment, index) => (
-                      <li key={`${segment.slice(0, 10)}-${index}`}>{segment}</li>
+                      <li key={index}>{segment}</li>
                     ))}
                   </ul>
                 </div>

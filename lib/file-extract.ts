@@ -16,8 +16,14 @@ export async function extractTextFromFile(
   }
 
   if (mimeType === "application/pdf" || extension === ".pdf") {
-    const pdfParseModule = await import("pdf-parse");
-    const pdfParse = (pdfParseModule as unknown as { default?: (input: Buffer) => Promise<{ text: string }> }).default ?? (pdfParseModule as unknown as (input: Buffer) => Promise<{ text: string }>);
+    const imported = await import("pdf-parse");
+    const pdfParseModule = imported as unknown as {
+      default?: (input: Buffer) => Promise<{ text: string }>;
+    };
+    const pdfParse = pdfParseModule.default;
+    if (!pdfParse) {
+      throw new Error("PDF parser failed to load.");
+    }
     const parsed = await pdfParse(buffer);
     return normalize(parsed.text || "");
   }

@@ -57,7 +57,8 @@ export async function POST(request: Request): Promise<Response> {
       extracted_characters: text.length,
       estimate
     });
-  } catch {
+  } catch (error) {
+    console.error("Analyze endpoint failure:", error);
     return NextResponse.json(
       { error: "File analysis failed. Please check file format and try again." },
       { status: 500 }
