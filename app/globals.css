@@ -115,6 +115,343 @@ button:disabled {
   color: var(--muted);
 }
 
+.muted.small {
+  font-size: 0.85rem;
+  margin: 0.2rem 0;
+}
+
 .error {
   color: var(--error);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Tabs                                                                     */
+/* ---------------------------------------------------------------------- */
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.tab-btn {
+  width: auto;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  border: 1px solid #2d375c;
+  background: #0f1528;
+  color: var(--muted);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tab-btn.tab-active {
+  background: var(--accent);
+  color: #041328;
+  border-color: var(--accent);
+}
+
+.tab-panel.hidden {
+  display: none;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Forms (shared)                                                          */
+/* ---------------------------------------------------------------------- */
+
+.form-fieldset {
+  border: 1px solid #27315b;
+  border-radius: 10px;
+  padding: 0.8rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.form-fieldset legend {
+  padding: 0 0.4rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.6rem;
+}
+
+.field-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.repeatable-block {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.divider {
+  border: none;
+  border-top: 1px dashed #2d375c;
+  margin: 0.4rem 0;
+}
+
+.bullet-row {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.bullet-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+button.secondary-btn {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+button.danger-btn {
+  background: transparent;
+  color: var(--error);
+  border: 1px solid var(--error);
+}
+
+button.small {
+  width: auto;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Resume Builder                                                          */
+/* ---------------------------------------------------------------------- */
+
+.resume-builder-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(320px, 1fr);
+  gap: 1.2rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .resume-builder-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.resume-form {
+  max-height: 80vh;
+  overflow-y: auto;
+  padding-right: 0.3rem;
+}
+
+.resume-preview-pane {
+  position: sticky;
+  top: 1rem;
+}
+
+.preview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.preview-actions button {
+  width: auto;
+  flex: 1 1 auto;
+}
+
+.resume-preview {
+  background: #ffffff;
+  color: #1a1a1a;
+  border-radius: 10px;
+  padding: 1.4rem;
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1.45;
+}
+
+.resume-preview-header {
+  text-align: center;
+  border-bottom: 2px solid #1a1a1a;
+  padding-bottom: 0.6rem;
+  margin-bottom: 0.8rem;
+}
+
+.resume-preview-header h3 {
+  margin: 0 0 0.2rem;
+  font-size: 1.5rem;
+}
+
+.resume-job-title {
+  margin: 0 0 0.3rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.resume-contact {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #444;
+}
+
+.resume-preview section {
+  margin-bottom: 0.9rem;
+}
+
+.resume-preview h4 {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #ccc;
+  margin: 0 0 0.4rem;
+  padding-bottom: 0.2rem;
+}
+
+.resume-entry {
+  margin-bottom: 0.5rem;
+}
+
+.resume-entry-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.resume-entry-sub {
+  margin: 0.1rem 0 0.3rem;
+  font-size: 0.85rem;
+  color: #555;
+  font-style: italic;
+}
+
+.resume-preview ul {
+  margin: 0.2rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.resume-preview p {
+  margin: 0.2rem 0;
+}
+
+/* ---------------------------------------------------------------------- */
+/* ATS Score Checker & Job Matcher                                          */
+/* ---------------------------------------------------------------------- */
+
+.ats-score-display {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+}
+
+.ats-score-number {
+  font-size: 2.4rem;
+  font-weight: 700;
+}
+
+.ats-score-grade {
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+.score-good .ats-score-number {
+  color: #4ddd8f;
+}
+
+.score-mid .ats-score-number {
+  color: #ffd166;
+}
+
+.score-low .ats-score-number {
+  color: var(--error);
+}
+
+.ats-checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.ats-checklist li {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  border: 1px solid #27315b;
+  border-radius: 8px;
+  padding: 0.6rem;
+}
+
+.ats-checklist li p {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.check-icon {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.check-pass .check-icon {
+  color: #4ddd8f;
+}
+
+.check-fail .check-icon {
+  color: var(--error);
+}
+
+.keyword-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.chip {
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.chip-match {
+  background: rgba(77, 221, 143, 0.15);
+  color: #4ddd8f;
+  border: 1px solid #4ddd8f;
+}
+
+.chip-missing {
+  background: rgba(255, 143, 143, 0.12);
+  color: var(--error);
+  border: 1px solid var(--error);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Print (Download PDF)                                                    */
+/* ---------------------------------------------------------------------- */
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #resume-print-area,
+  #resume-print-area * {
+    visibility: visible;
+  }
+  #resume-print-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-shadow: none;
+  }
+  .no-print {
+    display: none !important;
+  }
 }

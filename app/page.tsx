@@ -1,225 +1,81 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
-import { SeminarDetails, AiEstimate, IntentType } from "@/lib/types";
+import { useState } from "react";
+import ChatAssistant from "@/components/ChatAssistant";
+import AiDetector from "@/components/AiDetector";
+import ResumeBuilder from "@/components/ResumeBuilder";
+import AtsChecker from "@/components/AtsChecker";
+import JobMatcher from "@/components/JobMatcher";
 
-type ChatResponse = {
-  answer?: string;
-  error?: string;
-  intent?: IntentType;
-  seminar_details?: SeminarDetails;
-};
+type TabId = "chat" | "detector" | "builder" | "ats" | "match";
 
-type AnalyzeResponse = {
-  error?: string;
-  filename: string;
-  extracted_characters: number;
-  estimate: AiEstimate;
-};
-
-type Message = { role: "user" | "assistant"; content: string };
+const TABS: { id: TabId; label: string }[] = [
+  { id: "chat", label: "Chat Assistant" },
+  { id: "detector", label: "AI Usage Estimator" },
+  { id: "builder", label: "Resume Builder" },
+  { id: "ats", label: "ATS Score Checker" },
+  { id: "match", label: "Match to Job" }
+];
 
 export default function Home(): JSX.Element {
-  const [prompt, setPrompt] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [chatLoading, setChatLoading] = useState(false);
-  const [chatError, setChatError] = useState("");
-  const [seminarDetails, setSeminarDetails] = useState<SeminarDetails | null>(null);
+  const [activeTab, setActiveTab] = useState<TabId>("builder");
+  const [sharedResumeText, setSharedResumeText] = useState("");
+  const [atsSeed, setAtsSeed] = useState(0);
+  const [matchSeed, setMatchSeed] = useState(0);
 
-  const [file, setFile] = useState<File | null>(null);
-  const [analyzeLoading, setAnalyzeLoading] = useState(false);
-  const [analysisError, setAnalysisError] = useState("");
-  const [analysis, setAnalysis] = useState<AnalyzeResponse | null>(null);
-
-  const hasMessages = useMemo(() => messages.length > 0, [messages]);
-
-  async function handleChatSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
-    event.preventDefault();
-    const trimmed = prompt.trim();
-    if (!trimmed || chatLoading) return;
-
-    const nextMessages: Message[] = [...messages, { role: "user", content: trimmed }];
-    setMessages(nextMessages);
-    setPrompt("");
-    setChatError("");
-    setChatLoading(true);
-    setSeminarDetails(null);
-
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: trimmed, messages: nextMessages })
-      });
-      const data = (await response.json()) as ChatResponse;
-
-      if (!response.ok || data.error) {
-        throw new Error(data.error || "Unable to get chat response.");
-      }
-
-      if (data.seminar_details) {
-        setSeminarDetails(data.seminar_details);
-      }
-
-      setMessages((current) => [
-        ...current,
-        { role: "assistant", content: data.answer || "No response provided." }
-      ]);
-    } catch (error) {
-      setChatError(error instanceof Error ? error.message : "Chat request failed.");
-    } finally {
-      setChatLoading(false);
-    }
+  function sendToAts(text: string): void {
+    setSharedResumeText(text);
+    setAtsSeed((n) => n + 1);
+    setActiveTab("ats");
   }
 
-  async function handleAnalyze(event: FormEvent<HTMLFormElement>): Promise<void> {
-    event.preventDefault();
-    if (!file || analyzeLoading) return;
-
-    setAnalyzeLoading(true);
-    setAnalysisError("");
-    setAnalysis(null);
-
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        body: formData
-      });
-      const data = (await response.json()) as AnalyzeResponse;
-      if (!response.ok || data.error) {
-        throw new Error(data.error || "File analysis failed.");
-      }
-      setAnalysis(data);
-    } catch (error) {
-      setAnalysisError(error instanceof Error ? error.message : "Upload failed.");
-    } finally {
-      setAnalyzeLoading(false);
-    }
+  function sendToMatch(text: string): void {
+    setSharedResumeText(text);
+    setMatchSeed((n) => n + 1);
+    setActiveTab("match");
   }
 
   return (
     <main className="container">
       <header className="header">
-        <h1>AI Generator Dashboard</h1>
-        <p>Groq-powered chat + seminar detection + AI usage estimation.</p>
+        <h1>AI Career Toolkit</h1>
+        <p>
+          Groq-powered chat + seminar detection + AI usage estimation, plus a resume builder, ATS
+          score checker, and job-match analyzer.
+        </p>
       </header>
 
-      <section className="grid">
-        <article className="card">
-          <h2>Chat Assistant</h2>
-          <form onSubmit={handleChatSubmit} className="stack">
-            <textarea
-              aria-label="Prompt"
-              value={prompt}
-              onChange={(event) => setPrompt(event.target.value)}
-              placeholder="Ask any question… or ask seminar details."
-              rows={4}
-            />
-            <button type="submit" disabled={chatLoading}>
-              {chatLoading ? "Thinking..." : "Send"}
-            </button>
-          </form>
+      <nav className="tabs no-print" aria-label="Feature tabs">
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            className={`tab-btn ${activeTab === tab.id ? "tab-active" : ""}`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
 
-          {chatError ? <p className="error">{chatError}</p> : null}
+      <section className={activeTab === "chat" ? "tab-panel" : "tab-panel hidden"}>
+        <ChatAssistant />
+      </section>
 
-          <div className="messages" aria-live="polite">
-            {!hasMessages ? (
-              <p className="muted">No messages yet.</p>
-            ) : (
-              messages.map((message, index) => (
-                <div key={`${message.role}-${index}`} className={`message ${message.role}`}>
-                  <strong>{message.role === "user" ? "You" : "Assistant"}:</strong>
-                  <p>{message.content}</p>
-                </div>
-              ))
-            )}
-          </div>
+      <section className={activeTab === "detector" ? "tab-panel" : "tab-panel hidden"}>
+        <AiDetector />
+      </section>
 
-          {seminarDetails ? (
-            <div className="seminar">
-              <h3>Structured Seminar Details</h3>
-              <ul>
-                <li>
-                  <strong>Topic/Title:</strong> {seminarDetails.topic_or_title}
-                </li>
-                <li>
-                  <strong>Speaker:</strong> {seminarDetails.speaker}
-                </li>
-                <li>
-                  <strong>Date/Time:</strong> {seminarDetails.date_time}
-                </li>
-                <li>
-                  <strong>Venue:</strong> {seminarDetails.venue}
-                </li>
-                <li>
-                  <strong>Agenda/Summary:</strong> {seminarDetails.agenda_or_summary}
-                </li>
-                <li>
-                  <strong>Key Takeaways:</strong> {seminarDetails.key_takeaways}
-                </li>
-              </ul>
-            </div>
-          ) : null}
-        </article>
+      <section className={activeTab === "builder" ? "tab-panel" : "tab-panel hidden"}>
+        <ResumeBuilder onUseForAts={sendToAts} onUseForMatch={sendToMatch} />
+      </section>
 
-        <article className="card">
-          <h2>File AI Usage Estimator</h2>
-          <form onSubmit={handleAnalyze} className="stack">
-            <input
-              type="file"
-              aria-label="Upload file"
-              accept=".txt,.pdf,.docx,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-              onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-            />
-            <button type="submit" disabled={!file || analyzeLoading}>
-              {analyzeLoading ? "Analyzing..." : "Analyze file"}
-            </button>
-          </form>
+      <section className={activeTab === "ats" ? "tab-panel" : "tab-panel hidden"}>
+        <AtsChecker key={atsSeed} initialText={sharedResumeText} />
+      </section>
 
-          {analysisError ? <p className="error">{analysisError}</p> : null}
-          {!analysis && !analysisError ? (
-            <p className="muted">Upload TXT, PDF, or DOCX to estimate AI usage.</p>
-          ) : null}
-
-          {analysis ? (
-            <div className="analysis">
-              <p>
-                <strong>File:</strong> {analysis.filename}
-              </p>
-              <p>
-                <strong>Extracted characters:</strong> {analysis.extracted_characters}
-              </p>
-              <p>
-                <strong>Estimated AI %:</strong> {analysis.estimate.estimated_ai_percentage}
-              </p>
-              <p>
-                <strong>Estimated Human %:</strong> {analysis.estimate.estimated_human_percentage}
-              </p>
-              <p>
-                <strong>Confidence:</strong> {analysis.estimate.confidence}
-              </p>
-              <p>
-                <strong>Rationale:</strong> {analysis.estimate.rationale}
-              </p>
-              {analysis.estimate.flagged_segments.length > 0 ? (
-                <div>
-                  <strong>Flagged segments (sample):</strong>
-                  <ul>
-                    {analysis.estimate.flagged_segments.map((segment, index) => (
-                      <li key={index}>{segment}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-              <p className="muted">
-                Note: AI percentages are estimates and should not be treated as absolute truth.
-              </p>
-            </div>
-          ) : null}
-        </article>
+      <section className={activeTab === "match" ? "tab-panel" : "tab-panel hidden"}>
+        <JobMatcher key={matchSeed} initialResumeText={sharedResumeText} />
       </section>
     </main>
   );
